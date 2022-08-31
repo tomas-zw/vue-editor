@@ -1,5 +1,5 @@
 <script setup>
-import { RouterLink, RouterView } from "vue-router";
+//import { RouterLink, RouterView } from "vue-router";
 import HelloWorld from "./components/HelloWorld.vue";
 import TipTap from "./components/TipTap.vue";
 </script>
@@ -25,7 +25,7 @@ import TipTap from "./components/TipTap.vue";
   </header>
 
   <!--<RouterView />-->
-    <TipTap />
+  <TipTap />
 </template>
 
 <style scoped>
