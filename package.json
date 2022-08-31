@@ -5,7 +5,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 4173",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "deploy": "npm run build && rsync -av --delete dist/ toza21@ssh.student.bth.se:www/editor"
   },
   "dependencies": {
     "@tiptap/starter-kit": "^2.0.0-beta.191",

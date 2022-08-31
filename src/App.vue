@@ -1,6 +1,7 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
 import HelloWorld from "./components/HelloWorld.vue";
+import TipTap from "./components/TipTap.vue";
 </script>
 
 <template>
@@ -16,14 +17,15 @@ import HelloWorld from "./components/HelloWorld.vue";
     <div class="wrapper">
       <HelloWorld msg="Js-Ramverk" />
 
-      <nav>
+      <!--<nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-      </nav>
+      </nav>-->
     </div>
   </header>
 
-  <RouterView />
+  <!--<RouterView />-->
+    <TipTap />
 </template>
 
 <style scoped>
