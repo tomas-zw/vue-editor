@@ -26,6 +26,13 @@ const printContent = (text) => {
     >
       italic
     </button>
+    |
+    <button
+      @click="editor.chain().focus().setParagraph().run()"
+      :class="{ 'is-active': editor.isActive('paragraph') }"
+    >
+      paragraph
+    </button>
     <button
       @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
       :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
@@ -44,7 +51,10 @@ const printContent = (text) => {
     >
       h3
     </button>
-    <button @click="printContent(editor.getHTML())">console log</button>
+    |
+    <button @click="editor.chain().focus().undo().run()">undo</button>
+    <button @click="editor.chain().focus().redo().run()">redo</button> |
+    <button @click="printContent(editor.getHTML())">Spara</button>
   </div>
   <editor-content :editor="editor" />
 </template>
