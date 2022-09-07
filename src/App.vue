@@ -32,7 +32,7 @@ import TipTap from "./components/TipTap.vue";
 header {
   line-height: 1.5;
   max-height: 100vh;
-  background-color: gray;
+  background-color: #202124;
 }
 
 .logo {
@@ -65,7 +65,7 @@ nav a:first-of-type {
   border: 0;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 920px) {
   header {
     display: flex;
     place-items: center;
