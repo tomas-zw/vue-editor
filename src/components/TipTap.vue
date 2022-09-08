@@ -100,10 +100,12 @@ onMounted(async () => {
     <button @click="editor.chain().focus().redo().run()">redo</button>
     <span class="divider">|</span>
     <button @click="printContent(editor.getHTML())">consol.log</button>
-    <button @click="saveDoc({ title: 'default', body: editor.getHTML() })">
-      SparaDB
-    </button>
     <button @click="printDoc()">printdoc</button>
+    <span class="divider">|</span>
+    <button @click="saveDoc({ title: 'default', body: editor.getHTML() })">
+      Spara
+    </button>
+    <button @click="changeCurrentDoc({})">nytt dokument</button>
 
     <DropDown
       v-if="docs.collection"

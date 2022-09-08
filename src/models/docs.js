@@ -35,3 +35,7 @@ const docsModel = {
 };
 
 export default docsModel;
+
+//baseUrl: window.location.href.includes("localhost") ?
+//       "http://localhost:1337" :
+//      "https://jsramverk-wines-efostud.azurewebsites.net",
