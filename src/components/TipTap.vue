@@ -1,27 +1,41 @@
 <script setup>
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
-import { ref, onMounted, toRaw } from "vue";
+import { ref, onMounted, toRaw, watch } from "vue";
+
+import docsModel from "../models/docs.js";
 import DropDown from "./DropDown.vue";
 
+const docs = ref({});
+let currentDoc = ref({});
+
 const printContent = (text) => {
-  console.log("printcontent");
+  console.log("current body");
   console.log(text);
 };
 
-async function allDocs() {
-  let docs = await fetch("http://localhost:1337/");
-  const result = await docs.json();
-  console.log("alldocs");
-  console.log(result.data.mongo);
-  return result.data.mongo;
+function printDoc() {
+  console.log("all Docs");
+  console.log(toRaw(docs.value));
+  console.log("current doc");
+  console.log(toRaw(currentDoc.value));
 }
 
-const docs = ref({});
-
-function printDoc() {
-  console.log("printDoc");
-  console.log(toRaw(docs.value));
+async function saveDoc(newDoc) {
+  if (currentDoc.value._id) {
+    const docId = {
+      _id: currentDoc.value._id,
+      title: newDoc.title,
+      text: newDoc.body,
+    };
+    const res = await docsModel.updateDoc(docId);
+    docs.value = await docsModel.getDocs();
+    return;
+  }
+  const res = await docsModel.addDoc(newDoc);
+  docs.value = await docsModel.getDocs();
+  const newCurr = docs.value.collection.slice(-1);
+  changeCurrentDoc(newCurr[0]);
 }
 
 const editor = useEditor({
@@ -29,8 +43,16 @@ const editor = useEditor({
   extensions: [StarterKit],
 });
 
+function changeCurrentDoc(doc) {
+  currentDoc.value = doc;
+}
+
+watch(currentDoc, (newDoc, oldDoc) => {
+  editor.value.commands.setContent(newDoc.body);
+});
+
 onMounted(async () => {
-  docs.value = await allDocs();
+  docs.value = await docsModel.getDocs();
 });
 </script>
 
@@ -77,12 +99,18 @@ onMounted(async () => {
     <button @click="editor.chain().focus().undo().run()">undo</button>
     <button @click="editor.chain().focus().redo().run()">redo</button>
     <span class="divider">|</span>
-    <button @click="printContent(editor.getHTML())">Spara</button>
-
-    <button @click="printContent(docs)">printcontent</button>
+    <button @click="printContent(editor.getHTML())">consol.log</button>
+    <button @click="saveDoc({ title: 'default', body: editor.getHTML() })">
+      SparaDB
+    </button>
     <button @click="printDoc()">printdoc</button>
-    <button @click="editor.commands.setContent(docs[0].title)">alldocs</button>
-    <DropDown v-if="docs.length" :docs="docs" />
+
+    <DropDown
+      v-if="docs.collection"
+      :docs="docs.collection"
+      :setContent="editor.commands.setContent"
+      :setCurrentDoc="changeCurrentDoc"
+    />
   </div>
   <editor-content :editor="editor" />
 </template>
@@ -103,8 +131,13 @@ onMounted(async () => {
 }
 
 .divider {
-    margin: 5px;
+  margin: 5px;
   color: #798999;
+}
+
+.is-active {
+  text-decoration: underline;
+  color: red;
 }
 
 .menu button {
@@ -114,5 +147,6 @@ onMounted(async () => {
   border-radius: 2px;
   background-color: #42d392;
   cursor: pointer;
+  font-size: 1rem;
 }
 </style>

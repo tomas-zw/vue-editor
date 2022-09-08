@@ -3,6 +3,12 @@ defineProps({
   docs: {
     type: Array,
   },
+  setContent: {
+    type: Function,
+  },
+  setCurrentDoc: {
+    type: Function,
+  },
 });
 </script>
 
@@ -10,7 +16,10 @@ defineProps({
   <div class="dropdown">
     <button>Välj dokument</button>
     <div class="dropdown-content">
-      <p v-for="item in docs" :key="item._id">{{ item.title }}</p>
+      <!--<p v-for="item in docs" :key="item._id" @click="setContent(item.body)">-->
+      <p v-for="item in docs" :key="item._id" @click="setCurrentDoc(item)">
+        {{ item.title }}
+      </p>
     </div>
   </div>
 </template>
