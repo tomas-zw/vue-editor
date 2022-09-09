@@ -1,7 +1,8 @@
 <script setup>
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
-import { ref, onMounted, toRaw, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
+//import { ref, onMounted, toRaw, watch } from "vue";
 
 import docsModel from "../models/docs.js";
 import DropDown from "./DropDown.vue";
@@ -9,6 +10,7 @@ import DropDown from "./DropDown.vue";
 const docs = ref({});
 let currentDoc = ref({});
 
+/*
 const printContent = (text) => {
   console.log("current body");
   console.log(text);
@@ -20,6 +22,7 @@ function printDoc() {
   console.log("current doc");
   console.log(toRaw(currentDoc.value));
 }
+*/
 
 async function saveDoc(newDoc) {
   if (currentDoc.value._id) {
@@ -39,7 +42,8 @@ async function saveDoc(newDoc) {
 }
 
 const editor = useEditor({
-  content: "<h3>This is Tiptap 🎉</h3>",
+  content:
+    "<h3>Skapa ett nytt dokument eller välj ett befintligt från menyn.</h3>",
   extensions: [StarterKit],
 });
 
@@ -99,10 +103,19 @@ onMounted(async () => {
     <button @click="editor.chain().focus().undo().run()">undo</button>
     <button @click="editor.chain().focus().redo().run()">redo</button>
     <span class="divider">|</span>
+    <!--
     <button @click="printContent(editor.getHTML())">consol.log</button>
     <button @click="printDoc()">printdoc</button>
     <span class="divider">|</span>
-    <button @click="saveDoc({ title: 'default', body: editor.getHTML() })">
+        -->
+    <button
+      @click="
+        saveDoc({
+          title: currentDoc.title || 'ange titel',
+          body: editor.getHTML(),
+        })
+      "
+    >
       Spara
     </button>
     <button @click="changeCurrentDoc({})">nytt dokument</button>
@@ -114,6 +127,15 @@ onMounted(async () => {
       :setCurrentDoc="changeCurrentDoc"
     />
   </div>
+
+  <div class="title-wrap">
+    <input
+      class="title-bar"
+      v-model="currentDoc.title"
+      placeholder="<Titel för detta dokument>"
+    />
+  </div>
+
   <editor-content :editor="editor" />
 </template>
 
@@ -121,7 +143,7 @@ onMounted(async () => {
 /* Basic editor styles */
 .ProseMirror {
   min-height: 40vh;
-  margin: 2em;
+  margin: 1em 2em;
   border: 2px solid #41b883;
   border-radius: 5px;
   padding: 5px;
@@ -129,7 +151,22 @@ onMounted(async () => {
 }
 
 .menu {
-  margin: 2em;
+  margin: 2em 2em 1em 2em;
+}
+
+.title-wrap {
+  margin: 1em 2em;
+  border: 2px solid #41b883;
+  border-radius: 5px;
+  background-color: #fffdfa;
+}
+
+.title-bar {
+  width: 99%;
+  padding: 5px;
+  overflow: hidden;
+  text-align: center;
+  font-size: 1.1em;
 }
 
 .divider {
