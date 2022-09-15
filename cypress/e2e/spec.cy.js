@@ -1,6 +1,6 @@
 describe('My first tests', () => {
     before(() => {
-      cy.visit('http://localhost:5173/')
+      cy.visit('http://www.student.bth.se/~toza21/editor/')
   })
 
   it('Menu, titlebar and editor exists', () => {
