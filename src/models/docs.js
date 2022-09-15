@@ -31,6 +31,7 @@ const docsModel = {
       method: "PUT",
     });
     //const result = await response.json();
+    console.log(response);
 
     //return result.data;
     return "";
