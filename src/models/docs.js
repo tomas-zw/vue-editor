@@ -1,7 +1,11 @@
 const docsModel = {
+/*
   baseUrl: window.location.href.includes("localhost")
     ? "http://localhost:1337"
     : "https://jsramverk-editor-toza21.azurewebsites.net/",
+*/
+
+  baseUrl: "https://jsramverk-editor-toza21.azurewebsites.net/",
   getDocs: async function getDocs() {
     const response = await fetch(`${docsModel.baseUrl}`);
     const docs = await response.json();
