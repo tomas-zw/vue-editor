@@ -1,6 +1,6 @@
 describe('My first tests', () => {
     before(() => {
-      cy.visit('https://jsramverk-editor-toza21.azurewebsites.net/')
+      cy.visit('http://localhost:5173/')
   })
 
   it('Menu, titlebar and editor exists', () => {
