@@ -2,7 +2,7 @@
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import { ref, onMounted, onBeforeUnmount, watch } from "vue";
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
 import docsModel from "../models/docs.js";
 import DropDown from "./DropDown.vue";
@@ -18,29 +18,32 @@ const editor = useEditor({
 
 //----------------socket-------------------------
 
-let socket = io("http://localhost:1337/")
+let socket = io("http://localhost:1337/");
 
 socket.on("update_document", (data) => {
-    console.log(` doc ${data.body}`);
-    editor.value.commands.setContent(data.body);
+  changeCurrentDoc(data);
 });
 
 function joinRoom(room) {
-    socket.emit("create", room)
-};
+  socket.emit("create", room);
+}
 
 function leaveRoom(room) {
-    socket.emit("leave", room)
-};
+  socket.emit("leave", room);
+}
 
 function emitCurrentDocToRoom() {
-    socket.emit("update_document", currentDoc.value)
-};
+  socket.emit("update_document", currentDoc.value);
+}
+
+function emitOnlySavedDocument(newBody) {
+  currentDoc.value.body = newBody;
+  currentDoc.value._id ? emitCurrentDocToRoom() : console.log("not saved");
+}
 
 //----------------socket-------------------------
 
 async function saveDoc(newDoc) {
-
   if (currentDoc.value._id) {
     const docId = {
       _id: currentDoc.value._id,
@@ -49,7 +52,6 @@ async function saveDoc(newDoc) {
     };
     const res = await docsModel.updateDoc(docId);
     docs.value = await docsModel.getDocs();
-
 
     changeCurrentDoc(docId);
     emitCurrentDocToRoom();
@@ -60,23 +62,24 @@ async function saveDoc(newDoc) {
   docs.value = await docsModel.getDocs();
   const newCurr = docs.value.collection.slice(-1);
   changeCurrentDoc(newCurr[0]);
-
-};
-
+}
 
 function changeCurrentDoc(doc) {
   currentDoc.value = doc;
-};
+}
+
+function changeCurrentDocAndUpdateRooms(doc) {
+  if (currentDoc.value._id) {
+    leaveRoom(currentDoc.value._id);
+  }
+  if (doc._id) {
+    joinRoom(doc._id);
+  }
+  currentDoc.value = doc;
+}
 
 watch(currentDoc, (newDoc, oldDoc) => {
-    if (oldDoc._id) {
-        leaveRoom(oldDoc._id);
-    };
-    if (newDoc._id) {
-        joinRoom(newDoc._id);
-    };
   editor.value.commands.setContent(newDoc.body);
-  console.log("watch currentDoc")
 });
 
 onMounted(async () => {
@@ -84,8 +87,8 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
-    socket.disconnect();
-})
+  socket.disconnect();
+});
 </script>
 
 <template>
@@ -146,13 +149,13 @@ onBeforeUnmount(() => {
     >
       Spara
     </button>
-    <button @click="changeCurrentDoc({})">nytt dokument</button>
+    <button @click="changeCurrentDocAndUpdateRooms({})">nytt dokument</button>
 
     <DropDown
       v-if="docs.collection"
       :docs="docs.collection"
       :setContent="editor.commands.setContent"
-      :setCurrentDoc="changeCurrentDoc"
+      :setCurrentDoc="changeCurrentDocAndUpdateRooms"
     />
   </div>
 
@@ -160,11 +163,15 @@ onBeforeUnmount(() => {
     <input
       class="title-bar"
       v-model="currentDoc.title"
+      v-on:keyup="emitOnlySavedDocument(editor.getHTML())"
       placeholder="<Titel för detta dokument>"
     />
   </div>
 
-  <editor-content :editor="editor" />
+  <editor-content
+    v-on:keyup="emitOnlySavedDocument(editor.getHTML())"
+    :editor="editor"
+  />
 </template>
 
 <style>
