@@ -1,9 +1,8 @@
 <script setup>
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import { io } from 'socket.io-client';
-//import { ref, onMounted, toRaw, watch } from "vue";
 
 import docsModel from "../models/docs.js";
 import DropDown from "./DropDown.vue";
@@ -11,50 +10,71 @@ import DropDown from "./DropDown.vue";
 const docs = ref({});
 let currentDoc = ref({});
 
-let socket = io("http://localhost:1337/")
-
-/*
-const printContent = (text) => {
-  console.log("current body");
-  console.log(text);
-};
-
-function printDoc() {
-  console.log("all Docs");
-  console.log(toRaw(docs.value));
-  console.log("current doc");
-  console.log(toRaw(currentDoc.value));
-}
-*/
-
-async function saveDoc(newDoc) {
-  if (currentDoc.value._id) {
-    const docId = {
-      _id: currentDoc.value._id,
-      title: newDoc.title,
-      text: newDoc.body,
-    };
-    const res = await docsModel.updateDoc(docId);
-    docs.value = await docsModel.getDocs();
-    return;
-  }
-  const res = await docsModel.addDoc(newDoc);
-  docs.value = await docsModel.getDocs();
-  const newCurr = docs.value.collection.slice(-1);
-  changeCurrentDoc(newCurr[0]);
-}
-
 const editor = useEditor({
   content:
     "<h3>Skapa ett nytt dokument eller välj ett befintligt från menyn.</h3>",
   extensions: [StarterKit],
 });
 
+//----------------socket-------------------------
+
+let socket = io("http://localhost:1337/")
+
+socket.on("update_document", (data) => {
+    console.log(` doc ${data.body}`);
+    editor.value.commands.setContent(data.body);
+});
+
+function joinRoom(room) {
+    socket.emit("create", room)
+};
+
+function leaveRoom(room) {
+    socket.emit("leave", room)
+};
+
+function emitCurrentDocToRoom() {
+    socket.emit("update_document", currentDoc.value)
+};
+
+//----------------socket-------------------------
+
+async function saveDoc(newDoc) {
+
+  if (currentDoc.value._id) {
+    const docId = {
+      _id: currentDoc.value._id,
+      title: newDoc.title,
+      body: newDoc.body,
+    };
+    const res = await docsModel.updateDoc(docId);
+    docs.value = await docsModel.getDocs();
+
+
+    changeCurrentDoc(docId);
+    emitCurrentDocToRoom();
+
+    return;
+  }
+  const res = await docsModel.addDoc(newDoc);
+  docs.value = await docsModel.getDocs();
+  const newCurr = docs.value.collection.slice(-1);
+  changeCurrentDoc(newCurr[0]);
+
+};
+
+
 function changeCurrentDoc(doc) {
   currentDoc.value = doc;
-}
+};
 
 watch(currentDoc, (newDoc, oldDoc) => {
+    if (oldDoc._id) {
+        leaveRoom(oldDoc._id);
+    };
+    if (newDoc._id) {
+        joinRoom(newDoc._id);
+    };
   editor.value.commands.setContent(newDoc.body);
   console.log("watch currentDoc")
 });
@@ -62,6 +82,10 @@ watch(currentDoc, (newDoc, oldDoc) => {
 onMounted(async () => {
   docs.value = await docsModel.getDocs();
 });
+
+onBeforeUnmount(() => {
+    socket.disconnect();
+})
 </script>
 
 <template>
