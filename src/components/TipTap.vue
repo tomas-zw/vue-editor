@@ -2,6 +2,7 @@
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import { ref, onMounted, watch } from "vue";
+import { io } from 'socket.io-client';
 //import { ref, onMounted, toRaw, watch } from "vue";
 
 import docsModel from "../models/docs.js";
@@ -9,6 +10,8 @@ import DropDown from "./DropDown.vue";
 
 const docs = ref({});
 let currentDoc = ref({});
+
+let socket = io("http://localhost:1337/")
 
 /*
 const printContent = (text) => {
@@ -53,6 +56,7 @@ function changeCurrentDoc(doc) {
 
 watch(currentDoc, (newDoc, oldDoc) => {
   editor.value.commands.setContent(newDoc.body);
+  console.log("watch currentDoc")
 });
 
 onMounted(async () => {
