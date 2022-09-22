@@ -92,86 +92,91 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div v-if="editor" class="menu">
-    <button
-      @click="editor.chain().focus().toggleBold().run()"
-      :class="{ 'is-active': editor.isActive('bold') }"
-    >
-      bold
-    </button>
-    <button
-      @click="editor.chain().focus().toggleItalic().run()"
-      :class="{ 'is-active': editor.isActive('italic') }"
-    >
-      italic
-    </button>
-    <span class="divider">|</span>
-    <button
-      @click="editor.chain().focus().setParagraph().run()"
-      :class="{ 'is-active': editor.isActive('paragraph') }"
-    >
-      paragraph
-    </button>
-    <button
-      @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-      :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
-    >
-      h1
-    </button>
-    <button
-      @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-      :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
-    >
-      h2
-    </button>
-    <button
-      @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
-      :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }"
-    >
-      h3
-    </button>
-    <span class="divider">|</span>
-    <button @click="editor.chain().focus().undo().run()">undo</button>
-    <button @click="editor.chain().focus().redo().run()">redo</button>
-    <span class="divider">|</span>
-    <!--
-    <button @click="printContent(editor.getHTML())">consol.log</button>
-    <button @click="printDoc()">printdoc</button>
-    <span class="divider">|</span>
-        -->
-    <button
-      @click="
-        saveDoc({
-          title: currentDoc.title || 'ange titel',
-          body: editor.getHTML(),
-        })
-      "
-    >
-      Spara
-    </button>
-    <button @click="changeCurrentDocAndUpdateRooms({})">nytt dokument</button>
+  <div class="editor-wrapper">
+    <div v-if="editor" class="menu">
+      <div
+        class="emit-on-click"
+        @click="emitOnlySavedDocument(editor.getHTML())"
+      >
+        <button
+          @click="editor.chain().focus().toggleBold().run()"
+          :class="{ 'is-active': editor.isActive('bold') }"
+        >
+          bold
+        </button>
+        <button
+          @click="editor.chain().focus().toggleItalic().run()"
+          :class="{ 'is-active': editor.isActive('italic') }"
+        >
+          italic
+        </button>
+        <span class="divider">|</span>
+        <button
+          @click="editor.chain().focus().setParagraph().run()"
+          :class="{ 'is-active': editor.isActive('paragraph') }"
+        >
+          paragraph
+        </button>
+        <button
+          @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
+          :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
+        >
+          h1
+        </button>
+        <button
+          @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
+          :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
+        >
+          h2
+        </button>
+        <button
+          @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
+          :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }"
+        >
+          h3
+        </button>
+        <span class="divider">|</span>
+        <button @click="editor.chain().focus().undo().run()">undo</button>
+        <button @click="editor.chain().focus().redo().run()">redo</button>
+      </div>
+      <div class="save-menu">
+        <button
+          @click="
+            saveDoc({
+              title: currentDoc.title || 'ange titel',
+              body: editor.getHTML(),
+            })
+          "
+        >
+          Spara
+        </button>
+        <button @click="changeCurrentDocAndUpdateRooms({})">
+          nytt dokument
+        </button>
 
-    <DropDown
-      v-if="docs.collection"
-      :docs="docs.collection"
-      :setContent="editor.commands.setContent"
-      :setCurrentDoc="changeCurrentDocAndUpdateRooms"
-    />
-  </div>
+        <DropDown
+          v-if="docs.collection"
+          :docs="docs.collection"
+          :setContent="editor.commands.setContent"
+          :setCurrentDoc="changeCurrentDocAndUpdateRooms"
+        />
+      </div>
+    </div>
 
-  <div class="title-wrap">
-    <input
-      class="title-bar"
-      v-model="currentDoc.title"
+    <div class="title-wrap">
+      <input
+        class="title-bar"
+        v-model="currentDoc.title"
+        v-on:keyup="emitOnlySavedDocument(editor.getHTML())"
+        placeholder="<Titel för detta dokument>"
+      />
+    </div>
+
+    <editor-content
       v-on:keyup="emitOnlySavedDocument(editor.getHTML())"
-      placeholder="<Titel för detta dokument>"
+      :editor="editor"
     />
   </div>
-
-  <editor-content
-    v-on:keyup="emitOnlySavedDocument(editor.getHTML())"
-    :editor="editor"
-  />
 </template>
 
 <style>
@@ -185,7 +190,14 @@ onBeforeUnmount(() => {
   background-color: #fffdfa;
 }
 
+.editor-wrapper {
+  margin: auto;
+  max-width: 950px;
+}
+
 .menu {
+  display: flex;
+  justify-content: space-between;
   margin: 2em 2em 1em 2em;
 }
 
