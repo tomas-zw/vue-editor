@@ -18,7 +18,7 @@ const editor = useEditor({
 
 //----------------socket-------------------------
 
-let socket = io("http://localhost:1337/");
+let socket = io(docsModel.baseUrl);
 
 socket.on("update_document", (data) => {
   changeCurrentDoc(data);
