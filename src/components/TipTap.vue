@@ -209,7 +209,9 @@ onBeforeUnmount(() => {
 }
 
 .title-bar {
-  width: 99%;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
   padding: 5px;
   overflow: hidden;
   text-align: center;
