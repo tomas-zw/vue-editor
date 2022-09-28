@@ -2,6 +2,13 @@
 //import { RouterLink, RouterView } from "vue-router";
 import HelloWorld from "./components/HelloWorld.vue";
 import TipTap from "./components/TipTap.vue";
+import FormModal from "./components/FormModal.vue";
+import { ref } from "vue";
+
+const formActive = ref(false)
+const toggleForm = () => {
+    formActive.value = !formActive.value
+}
 </script>
 
 <template>
@@ -15,7 +22,7 @@ import TipTap from "./components/TipTap.vue";
     />
 
     <div class="wrapper">
-      <HelloWorld msg="Js-Ramverk" />
+      <HelloWorld msg="Js-Ramverk" :toggleForm="toggleForm"/>
 
       <!--<nav>
         <RouterLink to="/">Home</RouterLink>
@@ -23,7 +30,7 @@ import TipTap from "./components/TipTap.vue";
       </nav>-->
     </div>
   </header>
-
+  <FormModal :formActive="formActive" :toggleForm="toggleForm" />
   <!--<RouterView />-->
   <TipTap />
 </template>
