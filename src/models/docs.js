@@ -6,6 +6,7 @@ const docsModel = {
   getDocs: async function getDocs() {
     const response = await fetch(`${docsModel.baseUrl}`);
     const docs = await response.json();
+    console.log(`docs: ${docs.data}`)
 
     return docs.data;
   },

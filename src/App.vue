@@ -5,10 +5,10 @@ import TipTap from "./components/TipTap.vue";
 import FormModal from "./components/FormModal.vue";
 import { ref } from "vue";
 
-const formActive = ref(false)
+const formActive = ref(false);
 const toggleForm = () => {
-    formActive.value = !formActive.value
-}
+  formActive.value = !formActive.value;
+};
 </script>
 
 <template>
@@ -22,7 +22,7 @@ const toggleForm = () => {
     />
 
     <div class="wrapper">
-      <HelloWorld msg="Js-Ramverk" :toggleForm="toggleForm"/>
+      <HelloWorld msg="Js-Ramverk" :toggleForm="toggleForm" />
 
       <!--<nav>
         <RouterLink to="/">Home</RouterLink>

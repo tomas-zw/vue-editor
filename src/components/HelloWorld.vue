@@ -4,16 +4,18 @@ defineProps({
     type: String,
     required: true,
   },
-    toggleForm: {
-        type: Function,
-        required: true
-    }
+  toggleForm: {
+    type: Function,
+    required: true,
+  },
 });
 </script>
 
 <template>
   <div class="greetings">
-    <h1 class="green">{{ msg }}<button @click="toggleForm">Login/Register</button></h1>
+    <h1 class="green">
+      {{ msg }}<button @click="toggleForm">Login/Register</button>
+    </h1>
     <h3 class="links-login">
       <a target="_blank" href="https://vitejs.dev/">Vite</a> +
       <a target="_blank" href="https://vuejs.org/">Vue 3</a> +

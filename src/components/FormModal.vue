@@ -1,29 +1,73 @@
 <script setup>
+import { ref, watch } from "vue";
+import usersModel from "../models/users.js";
+import validateForm from "../models/validateForm.js";
+
 defineProps({
-    formActive: {
-        type: Boolean,
-        required: true,
-        default: false,
-    },
-    toggleForm: {
-        type: Function,
-        required: true,
+  formActive: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  toggleForm: {
+    type: Function,
+    required: true,
+  },
+});
+const email = ref("");
+const password = ref("");
+const emailMsg = ref("*");
+const passwordMsg = ref("*");
+const loggedIn = ref(false);
+const welcomeMsg = ref("Register or Login");
+
+const registerUser = async () => {
+    if (validateForm.isFormOk(emailMsg.value, passwordMsg.value)) {
+        const token = await usersModel.addUser(
+            {
+                email: email.value,
+                password: password.value
+            });
+        loggedIn.value = true;
     }
-})
+}
+watch(email, (newEmail, _) => {
+    if (!validateForm.validateEmail(newEmail)) {
+        emailMsg.value = "Not a valid Email."
+    } else {
+        emailMsg.value = "OK"
+    }
+});
+watch(password, (newPassword, _) => {
+    if (!validateForm.validatePassword(newPassword)) {
+        passwordMsg.value = "Needs to be atleast 4 chars."
+    } else {
+        passwordMsg.value = "OK"
+    }
+});
+watch(loggedIn, (newState, _) => {
+    if (newState) {
+        welcomeMsg.value = `Logged in as ${email.value}`;
+    }
+});
+
 </script>
 
 <template>
   <div v-if="formActive" class="form-wrapper">
     <div class="form-content">
       <form @submit.prevent>
-        <label>Email:</label>
-        <input type="email" required />
-        <label>Password:</label>
-        <input type="password" required />
+        <div class="center">
+            <h3>{{ welcomeMsg }}</h3>
+        </div>
+        <label>Email: <span class="error"> {{ emailMsg }}</span></label>
+        <input type="text" v-model="email" />
+        <label>Password: <span class="error">{{ passwordMsg }}</span></label>
+        <input type="password" v-model="password"/>
         <div class="submit">
           <button>Login</button>
-          <button>Register</button>
-          <button class="orange" @click.stop="toggleForm">Close</button>
+          <button class="red" @click.stop="toggleForm">X</button>
+          <button @click="registerUser">Register</button>
         </div>
       </form>
     </div>
@@ -47,8 +91,17 @@ defineProps({
   flex-direction: column;
   background-color: #fffdfa;
   border-radius: 10px;
-  max-height: 350px;
+  max-height: 410px;
   margin: 32px 5px;
+}
+
+.error {
+    color: red;
+    font-size: 1rem;
+}
+
+.center {
+    text-align: center;
 }
 
 form {
@@ -84,8 +137,11 @@ button {
   font-size: 1rem;
 }
 
-.orange {
-  background: orange;
+.red {
+  background: red;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 50%;
 }
 
 button:hover {
