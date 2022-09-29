@@ -20,6 +20,19 @@ const usersModel = {
 
     return result.data;
   },
+  login: async function login(user) {
+    const response = await fetch(`${usersModel.baseUrl}/login`, {
+      body: JSON.stringify(user),
+      headers: {
+        "content-type": "application/json",
+      },
+      method: "POST",
+    });
+    const result = await response.json();
+
+    //return result.data;
+    return result;
+    },
 };
 
 export default usersModel;

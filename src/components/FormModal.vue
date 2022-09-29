@@ -13,6 +13,10 @@ defineProps({
     type: Function,
     required: true,
   },
+  setToken: {
+        type: Function,
+        required: true,
+    },
 });
 const email = ref("");
 const password = ref("");
@@ -22,35 +26,50 @@ const loggedIn = ref(false);
 const welcomeMsg = ref("Register or Login");
 
 const registerUser = async () => {
-    if (validateForm.isFormOk(emailMsg.value, passwordMsg.value)) {
-        const token = await usersModel.addUser(
-            {
-                email: email.value,
-                password: password.value
-            });
+  if (validateForm.isFormOk(emailMsg.value, passwordMsg.value)) {
+    const _ = await usersModel.addUser({
+      email: email.value,
+      password: password.value,
+    });
+    //loggedIn.value = true;
+  }
+};
+
+const login = async (newToken) => {
+  if (validateForm.isFormOk(emailMsg.value, passwordMsg.value)) {
+    const token = await usersModel.login({
+      email: email.value,
+      password: password.value,
+    });
+    if (token.data) {
+        newToken(token.data)
         loggedIn.value = true;
     }
-}
-watch(email, (newEmail, _) => {
-    if (!validateForm.validateEmail(newEmail)) {
-        emailMsg.value = "Not a valid Email."
-    } else {
-        emailMsg.value = "OK"
+    if (token.errors) {
+        console.log(token.errors);
     }
+  }
+};
+
+watch(email, (newEmail, _) => {
+  if (!validateForm.validateEmail(newEmail)) {
+    emailMsg.value = "Not a valid Email.";
+  } else {
+    emailMsg.value = "OK";
+  }
 });
 watch(password, (newPassword, _) => {
-    if (!validateForm.validatePassword(newPassword)) {
-        passwordMsg.value = "Needs to be atleast 4 chars."
-    } else {
-        passwordMsg.value = "OK"
-    }
+  if (!validateForm.validatePassword(newPassword)) {
+    passwordMsg.value = "Needs to be atleast 4 chars.";
+  } else {
+    passwordMsg.value = "OK";
+  }
 });
 watch(loggedIn, (newState, _) => {
-    if (newState) {
-        welcomeMsg.value = `Logged in as ${email.value}`;
-    }
+  if (newState) {
+    welcomeMsg.value = `Logged in as ${email.value}`;
+  }
 });
-
 </script>
 
 <template>
@@ -58,16 +77,23 @@ watch(loggedIn, (newState, _) => {
     <div class="form-content">
       <form @submit.prevent>
         <div class="center">
-            <h3>{{ welcomeMsg }}</h3>
+          <h3>{{ welcomeMsg }}</h3>
         </div>
-        <label>Email: <span class="error"> {{ emailMsg }}</span></label>
+        <label
+          >Email: <span class="error"> {{ emailMsg }}</span></label
+        >
         <input type="text" v-model="email" />
-        <label>Password: <span class="error">{{ passwordMsg }}</span></label>
-        <input type="password" v-model="password"/>
+        <label
+          >Password: <span class="error">{{ passwordMsg }}</span></label
+        >
+        <input type="password" v-model="password" />
+        <!-- TODO fix buttons when logged in -->
         <div class="submit">
-          <button>Login</button>
+          <button :class="loggedIn && 'disabled'" @click="login(setToken)">Login</button>
           <button class="red" @click.stop="toggleForm">X</button>
-          <button @click="registerUser">Register</button>
+          <button :class="loggedIn && 'disabled'" @click="registerUser">
+            register
+          </button>
         </div>
       </form>
     </div>
@@ -96,12 +122,17 @@ watch(loggedIn, (newState, _) => {
 }
 
 .error {
-    color: red;
-    font-size: 1rem;
+  color: red;
+  font-size: 1rem;
+}
+
+.disabled {
+  background-color: gray;
+  color: lightgray;
 }
 
 .center {
-    text-align: center;
+  text-align: center;
 }
 
 form {

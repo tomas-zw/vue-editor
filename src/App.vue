@@ -5,10 +5,19 @@ import TipTap from "./components/TipTap.vue";
 import FormModal from "./components/FormModal.vue";
 import { ref } from "vue";
 
+const token = ref("")
+
 const formActive = ref(false);
 const toggleForm = () => {
   formActive.value = !formActive.value;
 };
+
+const setToken = (newToken) => {
+    token.value = newToken;
+    console.log(`new token = ${token.value.token}`)
+    console.log(`new email = ${token.value.email}`)
+}
+
 </script>
 
 <template>
@@ -30,7 +39,7 @@ const toggleForm = () => {
       </nav>-->
     </div>
   </header>
-  <FormModal :formActive="formActive" :toggleForm="toggleForm" />
+  <FormModal :formActive="formActive" :toggleForm="toggleForm" :setToken="setToken" />
   <!--<RouterView />-->
   <TipTap />
 </template>
