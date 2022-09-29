@@ -14,9 +14,9 @@ defineProps({
     required: true,
   },
   setToken: {
-        type: Function,
-        required: true,
-    },
+    type: Function,
+    required: true,
+  },
 });
 const email = ref("");
 const password = ref("");
@@ -42,11 +42,11 @@ const login = async (newToken) => {
       password: password.value,
     });
     if (token.data) {
-        newToken(token.data)
-        loggedIn.value = true;
+      newToken(token.data);
+      loggedIn.value = true;
     }
     if (token.errors) {
-        console.log(token.errors);
+      console.log(token.errors);
     }
   }
 };
@@ -89,7 +89,9 @@ watch(loggedIn, (newState, _) => {
         <input type="password" v-model="password" />
         <!-- TODO fix buttons when logged in -->
         <div class="submit">
-          <button :class="loggedIn && 'disabled'" @click="login(setToken)">Login</button>
+          <button :class="loggedIn && 'disabled'" @click="login(setToken)">
+            Login
+          </button>
           <button class="red" @click.stop="toggleForm">X</button>
           <button :class="loggedIn && 'disabled'" @click="registerUser">
             register

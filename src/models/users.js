@@ -32,7 +32,7 @@ const usersModel = {
 
     //return result.data;
     return result;
-    },
+  },
 };
 
 export default usersModel;

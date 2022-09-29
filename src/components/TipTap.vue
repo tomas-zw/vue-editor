@@ -7,6 +7,10 @@ import { io } from "socket.io-client";
 import docsModel from "../models/docs.js";
 import DropDown from "./DropDown.vue";
 
+const props = defineProps({
+  token: Object,
+});
+
 const docs = ref({});
 let currentDoc = ref({});
 
@@ -43,6 +47,10 @@ function emitOnlySavedDocument(newBody) {
 
 //----------------socket-------------------------
 
+async function getDocuments() {
+  docs.value = await docsModel.getDocs(props.token.token);
+}
+
 async function saveDoc(newDoc) {
   if (currentDoc.value._id) {
     const docId = {
@@ -50,18 +58,24 @@ async function saveDoc(newDoc) {
       title: newDoc.title,
       body: newDoc.body,
     };
-    const res = await docsModel.updateDoc(docId);
-    docs.value = await docsModel.getDocs();
+    const res = await docsModel.updateDoc(docId, props.token.token);
+    //docs.value = await docsModel.getDocs(props.token.token);
+    getDocuments();
 
     changeCurrentDoc(docId);
     emitCurrentDocToRoom();
 
     return;
   }
-  const res = await docsModel.addDoc(newDoc);
-  docs.value = await docsModel.getDocs();
-  const newCurr = docs.value.collection.slice(-1);
-  changeCurrentDoc(newCurr[0]);
+  const res = await docsModel.addDoc(newDoc, props.token.token);
+  //docs.value = await docsModel.getDocs(props.token.token);
+  getDocuments();
+  console.log(`before propsDocs = ${docs.value.collection}`);
+  if (res) {
+    console.log(`res.docs = ${res.doc.insertedId}`);
+    currentDoc.value._id = res.doc.insertedId;
+  }
+  console.log(`propsDocs = ${docs.value}`);
 }
 
 function changeCurrentDoc(doc) {
@@ -75,6 +89,7 @@ function changeCurrentDocAndUpdateRooms(doc) {
   if (doc._id) {
     joinRoom(doc._id);
   }
+  console.log(`token = ${props.token.token}`);
   currentDoc.value = doc;
 }
 
@@ -83,7 +98,8 @@ watch(currentDoc, (newDoc, oldDoc) => {
 });
 
 onMounted(async () => {
-  docs.value = await docsModel.getDocs();
+  console.log("mounted");
+  //docs.value = await docsModel.getDocs(props.token);
 });
 
 onBeforeUnmount(() => {
@@ -139,7 +155,7 @@ onBeforeUnmount(() => {
         <button @click="editor.chain().focus().undo().run()">undo</button>
         <button @click="editor.chain().focus().redo().run()">redo</button>
       </div>
-      <div class="save-menu">
+      <div v-if="token.token" class="save-menu">
         <button
           @click="
             saveDoc({
@@ -155,10 +171,10 @@ onBeforeUnmount(() => {
         </button>
 
         <DropDown
-          v-if="docs.collection"
           :docs="docs.collection"
           :setContent="editor.commands.setContent"
           :setCurrentDoc="changeCurrentDocAndUpdateRooms"
+          :getDocuments="getDocuments"
         />
       </div>
     </div>
@@ -236,5 +252,9 @@ onBeforeUnmount(() => {
   background-color: #42d392;
   cursor: pointer;
   font-size: 1rem;
+}
+
+button:hover {
+  text-decoration: underline;
 }
 </style>

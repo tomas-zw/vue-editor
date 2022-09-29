@@ -9,12 +9,15 @@ defineProps({
   setCurrentDoc: {
     type: Function,
   },
+  getDocuments: {
+    type: Function,
+  },
 });
 </script>
 
 <template>
   <div class="dropdown">
-    <button>Välj dokument</button>
+    <button @click="getDocuments">Välj dokument</button>
     <div class="dropdown-content">
       <!--<p v-for="item in docs" :key="item._id" @click="setContent(item.body)">-->
       <p v-for="item in docs" :key="item._id" @click="setCurrentDoc(item)">
