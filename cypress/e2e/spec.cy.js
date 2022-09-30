@@ -25,7 +25,7 @@ describe("My first tests", () => {
       .find("p")
       .should("contain", "This is a new Body");
   });
-
+  /* kmom05 
   it('Open "MongoDB Atlas" dokument', () => {
     cy.contains("Välj dokument").focus();
     cy.get(".dropdown-content")
@@ -33,4 +33,5 @@ describe("My first tests", () => {
       .click({ force: true });
     cy.get(".title-bar").should("have.value", "MongoDB Atlas");
   });
+*/
 });

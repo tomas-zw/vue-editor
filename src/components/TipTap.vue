@@ -1,22 +1,24 @@
 <script setup>
 import { useEditor, EditorContent } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
-import { ref, onMounted, onBeforeUnmount, watch } from "vue";
+import { ref, onBeforeUnmount, watch } from "vue";
 import { io } from "socket.io-client";
 
 import docsModel from "../models/docs.js";
 import DropDown from "./DropDown.vue";
+import UserSelect from "./UserSelect.vue";
 
 const props = defineProps({
   token: Object,
 });
 
+const allUsers = ref({});
 const docs = ref({});
 let currentDoc = ref({});
 
 const editor = useEditor({
   content:
-    "<h3>Skapa ett nytt dokument eller välj ett befintligt från menyn.</h3>",
+    "<h3> Registrera och/eller Logga in för att spara och hämta dokument.</h3>",
   extensions: [StarterKit],
 });
 
@@ -47,8 +49,12 @@ function emitOnlySavedDocument(newBody) {
 
 //----------------socket-------------------------
 
+async function getUsers() {
+  allUsers.value = await docsModel.getUsers(props.token.token);
+}
+
 async function getDocuments() {
-  docs.value = await docsModel.getDocs(props.token.token);
+  docs.value = await docsModel.getDocs(props.token);
 }
 
 async function saveDoc(newDoc) {
@@ -57,9 +63,9 @@ async function saveDoc(newDoc) {
       _id: currentDoc.value._id,
       title: newDoc.title,
       body: newDoc.body,
+      users: currentDoc.value.users,
     };
     const res = await docsModel.updateDoc(docId, props.token.token);
-    //docs.value = await docsModel.getDocs(props.token.token);
     getDocuments();
 
     changeCurrentDoc(docId);
@@ -67,19 +73,28 @@ async function saveDoc(newDoc) {
 
     return;
   }
-  const res = await docsModel.addDoc(newDoc, props.token.token);
-  //docs.value = await docsModel.getDocs(props.token.token);
+  const firstSave = {
+    owner: props.token.email,
+    title: newDoc.title,
+    body: newDoc.body,
+    users: [props.token.email],
+  };
+  const res = await docsModel.addDoc(firstSave, props.token.token);
+  //console.log(`token email: ${props.token.email}`);
+  getUsers();
   getDocuments();
-  console.log(`before propsDocs = ${docs.value.collection}`);
   if (res) {
-    console.log(`res.docs = ${res.doc.insertedId}`);
-    currentDoc.value._id = res.doc.insertedId;
+    //console.log(`res.docs = ${res.doc.insertedId}`);
+    firstSave._id = res.doc.insertedId;
+    changeCurrentDoc(firstSave);
   }
-  console.log(`propsDocs = ${docs.value}`);
+  //console.log(`propsDocs = ${docs.value}`);
 }
 
 function changeCurrentDoc(doc) {
   currentDoc.value = doc;
+  getUsers();
+  //console.log(`usersArray for current: ${currentDoc.value.users}`);
 }
 
 function changeCurrentDocAndUpdateRooms(doc) {
@@ -89,17 +104,12 @@ function changeCurrentDocAndUpdateRooms(doc) {
   if (doc._id) {
     joinRoom(doc._id);
   }
-  console.log(`token = ${props.token.token}`);
-  currentDoc.value = doc;
+  //console.log(`token = ${props.token.token}`);
+  changeCurrentDoc(doc);
 }
 
 watch(currentDoc, (newDoc, oldDoc) => {
   editor.value.commands.setContent(newDoc.body);
-});
-
-onMounted(async () => {
-  console.log("mounted");
-  //docs.value = await docsModel.getDocs(props.token);
 });
 
 onBeforeUnmount(() => {
@@ -192,6 +202,7 @@ onBeforeUnmount(() => {
       v-on:keyup="emitOnlySavedDocument(editor.getHTML())"
       :editor="editor"
     />
+    <UserSelect :docs="currentDoc" :allUsers="allUsers" :token="token" />
   </div>
 </template>
 

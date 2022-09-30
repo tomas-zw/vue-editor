@@ -1,19 +1,32 @@
 const docsModel = {
   baseUrl: window.location.href.includes("localhost")
-    ? "http://localhost:1337"
+    ? "http://localhost:1337/"
     : "https://jsramverk-editor-toza21.azurewebsites.net/",
 
   getDocs: async function getDocs(token) {
-    const response = await fetch(`${docsModel.baseUrl}`, {
+    const params = `?find=${token.email}`;
+    const response = await fetch(`${docsModel.baseUrl}${params}`, {
+      headers: {
+        "x-access-token": token.token,
+      },
+    });
+    const docs = await response.json();
+    //console.log(`docs: ${docs.data}`);
+
+    //return docs.data;
+    return docs.data || {};
+  },
+
+  getUsers: async function getUsers(token) {
+    const response = await fetch(`${docsModel.baseUrl}users`, {
       headers: {
         "x-access-token": token,
       },
     });
-    const docs = await response.json();
-    console.log(`docs: ${docs.data}`);
+    const users = await response.json();
+    //console.log(`docs: ${users.data}`);
 
-    //return docs.data;
-    return docs.data || {};
+    return users.data || {};
   },
   addDoc: async function addDoc(newDoc, token) {
     const response = await fetch(`${docsModel.baseUrl}`, {
@@ -24,7 +37,7 @@ const docsModel = {
       },
       method: "POST",
     });
-    console.log(response);
+    //console.log(response);
     const result = await response.json();
 
     return result.data;
@@ -39,7 +52,7 @@ const docsModel = {
       method: "PUT",
     });
     //const result = await response.json();
-    console.log(response);
+    //console.log(response);
 
     //return result.data;
     return "";
@@ -47,7 +60,3 @@ const docsModel = {
 };
 
 export default docsModel;
-
-//baseUrl: window.location.href.includes("localhost") ?
-//       "http://localhost:1337" :
-//      "https://jsramverk-wines-efostud.azurewebsites.net",
