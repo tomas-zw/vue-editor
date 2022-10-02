@@ -23,15 +23,22 @@ const password = ref("");
 const emailMsg = ref("*");
 const passwordMsg = ref("*");
 const loggedIn = ref(false);
+const registeredOk = ref(false);
 const welcomeMsg = ref("Register or Login");
 
 const registerUser = async () => {
   if (validateForm.isFormOk(emailMsg.value, passwordMsg.value)) {
-    const _ = await usersModel.addUser({
+    const user = await usersModel.addUser({
       email: email.value,
       password: password.value,
     });
-    //loggedIn.value = true;
+    if (user.user) {
+      welcomeMsg.value = `${email.value} registered.`;
+      registeredOk.value = true;
+    }
+    if (user.errors) {
+      welcomeMsg.value = user.errors.title;
+    }
   }
 };
 
@@ -46,7 +53,7 @@ const login = async (newToken) => {
       loggedIn.value = true;
     }
     if (token.errors) {
-      console.log(token.errors);
+      welcomeMsg.value = token.errors.title;
     }
   }
 };
@@ -93,7 +100,7 @@ watch(loggedIn, (newState, _) => {
             Login
           </button>
           <button class="red" @click.stop="toggleForm">X</button>
-          <button :class="loggedIn && 'disabled'" @click="registerUser">
+          <button :class="registeredOk && 'disabled'" @click="registerUser">
             register
           </button>
         </div>
@@ -129,8 +136,7 @@ watch(loggedIn, (newState, _) => {
 }
 
 .disabled {
-  background-color: gray;
-  color: lightgray;
+  display: none;
 }
 
 .center {
