@@ -4,18 +4,22 @@ describe("My first tests", () => {
   });
 
   it("Menu, titlebar and editor exists", () => {
-    cy.get(".menu").contains("Spara");
-    cy.get(".menu").contains("nytt dokument");
-    cy.get(".menu").contains("Välj dokument");
+    cy.get(".green").contains("Login/Register");
     cy.get(".title-bar").should("have.value", "");
     cy.get(".ProseMirror").should(
       "contain",
-      "Skapa ett nytt dokument eller välj ett befintligt från menyn."
+      "Registrera och/eller Logga in för att spara och hämta dokument."
     );
   });
 
   it("Edit title and body in a new document", () => {
-    cy.contains("nytt dokument").click();
+    cy.contains("Login/Register").click();
+    cy.contains("Email");
+    cy.contains("Password");
+    cy.contains("Login");
+    cy.contains("X");
+    cy.contains("Register");
+    /*
     cy.get(".title-bar")
       .type("This is a new Title")
       .should("have.value", "This is a new Title");
@@ -24,6 +28,7 @@ describe("My first tests", () => {
       .type("This is a new Body")
       .find("p")
       .should("contain", "This is a new Body");
+    */
   });
   /* kmom05 
   it('Open "MongoDB Atlas" dokument', () => {

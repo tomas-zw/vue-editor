@@ -101,7 +101,7 @@ watch(loggedIn, (newState, _) => {
           </button>
           <button class="red" @click.stop="toggleForm">X</button>
           <button :class="registeredOk && 'disabled'" @click="registerUser">
-            register
+            Register
           </button>
         </div>
       </form>
