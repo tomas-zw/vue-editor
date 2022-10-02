@@ -86,6 +86,7 @@ async function saveDoc(newDoc) {
   if (res) {
     //console.log(`res.docs = ${res.doc.insertedId}`);
     firstSave._id = res.doc.insertedId;
+    joinRoom(firstSave._id);
     changeCurrentDoc(firstSave);
   }
   //console.log(`propsDocs = ${docs.value}`);
