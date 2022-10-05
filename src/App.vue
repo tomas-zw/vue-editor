@@ -14,8 +14,6 @@ const toggleForm = () => {
 
 const setToken = (newToken) => {
   token.value = newToken;
-  console.log(`new token = ${token.value.token}`);
-  console.log(`new email = ${token.value.email}`);
 };
 </script>
 
