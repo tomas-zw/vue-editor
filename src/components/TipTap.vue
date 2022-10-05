@@ -5,6 +5,7 @@ import { ref, onBeforeUnmount, watch } from "vue";
 import { io } from "socket.io-client";
 
 import docsModel from "../models/docs.js";
+import graphqlModel from "../models/graphql.js";
 import DropDown from "./DropDown.vue";
 import UserSelect from "./UserSelect.vue";
 
@@ -49,13 +50,19 @@ function emitOnlySavedDocument(newBody) {
 
 //----------------socket-------------------------
 
+//----------graphql--------------
+
 async function getUsers() {
-  allUsers.value = await docsModel.getUsers(props.token.token);
+  //allUsers.value = await docsModel.getUsers(props.token.token);
+  allUsers.value = await graphqlModel.getUsers(props.token.token);
 }
 
 async function getDocuments() {
-  docs.value = await docsModel.getDocs(props.token);
+  //docs.value = await docsModel.getDocs(props.token);
+  docs.value = await graphqlModel.getDocs(props.token);
 }
+
+//----------graphql--------------
 
 async function saveDoc(newDoc) {
   if (currentDoc.value._id) {
