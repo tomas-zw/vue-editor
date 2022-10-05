@@ -29,7 +29,7 @@ const graphqlModel = {
     const response = await fetch(`${graphqlModel.baseUrl}`, {
       method: "POST",
       headers: {
-        "x-access-token": token.token,
+        "x-access-token": token,
         "Content-Type": "application/json",
         Accept: "application/json",
       },
