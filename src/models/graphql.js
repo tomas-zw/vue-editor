@@ -8,17 +8,19 @@ const graphqlModel = {
       method: "POST",
       headers: {
         "x-access-token": token.token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-      body: JSON.stringify({ query: `{ docs(email: "${token.email}") {_id owner title body users}}` })
+      body: JSON.stringify({
+        query: `{ docs(email: "${token.email}") {_id owner title body users}}`,
+      }),
     });
     const docs = await response.json();
     const data = {
       data: {
         msg: "graphql",
-        collection: docs.data.docs
-      }
+        collection: docs.data.docs,
+      },
     };
 
     return data.data || {};
@@ -28,17 +30,17 @@ const graphqlModel = {
       method: "POST",
       headers: {
         "x-access-token": token.token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-      body: JSON.stringify({ query: `{ userNames { email }}` })
+      body: JSON.stringify({ query: `{ userNames { email }}` }),
     });
     const users = await response.json();
     const data = {
       data: {
         msg: "graphql",
-        users: users.data.userNames
-      }
+        users: users.data.userNames,
+      },
     };
 
     return data.data || {};
