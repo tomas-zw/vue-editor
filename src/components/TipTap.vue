@@ -4,6 +4,8 @@ import StarterKit from "@tiptap/starter-kit";
 import { ref, onBeforeUnmount, watch } from "vue";
 import { io } from "socket.io-client";
 
+import html2pdf from "html2pdf.js";
+
 import docsModel from "../models/docs.js";
 import graphqlModel from "../models/graphql.js";
 import DropDown from "./DropDown.vue";
@@ -63,6 +65,22 @@ async function getDocuments() {
 }
 
 //----------graphql--------------
+
+//----------html2pdf--------------
+
+function exportToPDF() {
+  let title = "no-title.pdf";
+
+  if (currentDoc.value.title) {
+    title = currentDoc.value.title.replace(/\s/g, "-");
+    title += ".pdf";
+  }
+  html2pdf(document.getElementsByClassName("ProseMirror")[0], {
+    filename: title,
+  });
+}
+
+//----------html2pdf--------------
 
 async function saveDoc(newDoc) {
   if (currentDoc.value._id) {
@@ -127,6 +145,9 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="editor-wrapper">
+    <div class="center">
+      <button @click="exportToPDF">Export to PDF</button>
+    </div>
     <div v-if="editor" class="menu">
       <div
         class="emit-on-click"
@@ -173,6 +194,7 @@ onBeforeUnmount(() => {
         <button @click="editor.chain().focus().undo().run()">undo</button>
         <button @click="editor.chain().focus().redo().run()">redo</button>
       </div>
+
       <div v-if="token.token" class="save-menu">
         <button
           @click="
@@ -233,7 +255,12 @@ onBeforeUnmount(() => {
 .menu {
   display: flex;
   justify-content: space-between;
-  margin: 2em 2em 1em 2em;
+  margin: 1em 2em 1em 2em;
+}
+
+.center {
+  text-align: center;
+  padding-top: 1em;
 }
 
 .title-wrap {
@@ -263,7 +290,7 @@ onBeforeUnmount(() => {
   color: red;
 }
 
-.menu button {
+button {
   margin: 2px;
   padding: 5px;
   border: 2px solid #41b883;
