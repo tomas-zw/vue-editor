@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import docsModel from "../models/docs.js";
+import emailModel from "../models/email.js";
 
 const props = defineProps({
   docs: {
@@ -22,7 +23,8 @@ async function saveNewUserList() {
     return;
   }
   if (props.docs.users.includes(selectedNewUser.value)) {
-    //already in list
+    //already in list just nofify
+    const mail = await emailModel.sendEmail(selectedNewUser.value, props.token);
     return;
   }
   //props.docs.users.push(selectedNewUser.value);
@@ -31,6 +33,7 @@ async function saveNewUserList() {
   let newUsersList = props.docs;
   newUsersList.users.push(selectedNewUser.value);
   const _ = await docsModel.updateDoc(newUsersList, props.token.token);
+  const mail = await emailModel.sendEmail(selectedNewUser.value, props.token);
 }
 </script>
 
@@ -54,7 +57,7 @@ async function saveNewUserList() {
           </option></select
         ><br />
         <button class="select-user green" @click="saveNewUserList()">
-          lägg till användare
+          Add and/or notify user
         </button>
       </form>
     </div>
